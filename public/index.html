@@ -55,6 +55,41 @@
     a { color: inherit; }
     .page { position: relative; z-index: 1; }
 
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      z-index: 80;
+      background: rgba(20,17,15,.08);
+    }
+    .scroll-progress span {
+      display: block;
+      width: calc(var(--scroll, 0) * 100%);
+      height: 100%;
+      background: linear-gradient(90deg, var(--brick), var(--gold), var(--sage));
+      box-shadow: 0 0 22px rgba(210,167,95,.45);
+    }
+    .scroll-hud {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      display: grid;
+      gap: 3px;
+      min-width: 132px;
+      padding: 13px 15px;
+      border-radius: 20px;
+      background: rgba(20,17,15,.78);
+      color: white;
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 48px rgba(20,17,15,.22);
+    }
+    .scroll-hud b { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: rgba(255,255,255,.56); }
+    .scroll-hud span { font-size: 24px; font-weight: 950; letter-spacing: -.05em; color: #f2c67d; }
+
     .nav {
       position: fixed;
       top: 18px;
@@ -136,6 +171,8 @@
     }
     .button.primary { background: var(--ink); color: white; border-color: var(--ink); }
 
+    .hero-grid { transform: translateY(calc(var(--scroll, 0) * -18px)); transition: transform .08s linear; }
+
     .house-stage {
       position: sticky;
       top: 96px;
@@ -149,7 +186,21 @@
       border: 1px solid rgba(255,255,255,.48);
       box-shadow: var(--shadow);
       overflow: hidden;
+      isolation: isolate;
     }
+    .house-stage::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        linear-gradient(115deg, transparent 0 37%, rgba(255,255,255,.34) 42%, transparent 48%),
+        repeating-linear-gradient(90deg, transparent 0 82px, rgba(255,255,255,.10) 83px 84px);
+      transform: translateX(calc((var(--scroll, 0) - .2) * 220px)) rotate(8deg);
+      opacity: .44;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .house-stage > * { z-index: 1; }
     .house-stage::before {
       content: "ANTES → DESPUÉS";
       position: absolute;
@@ -276,6 +327,28 @@
     .s1 { left: 32px; bottom: 128px; }
     .s2 { right: 30px; bottom: 178px; }
     .s3 { left: 126px; top: 118px; }
+    .tool-chip {
+      position: absolute;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(20,17,15,.8);
+      color: white;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 12px 30px rgba(20,17,15,.22);
+      opacity: calc(.25 + var(--scroll, 0) * 1.2);
+      transform: translate3d(calc(var(--mx, 0px) * .018), calc(var(--my, 0px) * .018), 0);
+      transition: opacity .35s ease;
+    }
+    .tool-chip.t1 { left: 38px; top: 92px; }
+    .tool-chip.t2 { right: 40px; top: 132px; }
+    .tool-chip.t3 { right: 70px; bottom: 92px; }
+
 
     body[data-stage="1"] { --blueprint-o: .72; --roof-y: 18px; --roof-o: .52; --wall-y: 28px; --wall-o: .58; --door-y: 54px; --door-o: .38; --window-o: .28; --window-s: .76; --signal-o: .35; --signal-y: 10px; }
     body[data-stage="2"] { --blueprint-o: .34; --blueprint-s: .96; --roof-y: 4px; --roof-r: 0deg; --roof-o: .82; --wall-y: 8px; --wall-o: .86; --door-y: 20px; --door-o: .72; --window-o: .78; --window-s: .94; --signal-o: .72; --signal-y: 3px; }
@@ -392,6 +465,50 @@
     .time-item b { color: var(--brick); }
     .time-item p { margin: 0; color: #5e544b; line-height: 1.5; }
 
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 28px;
+    }
+    .person-card {
+      position: relative;
+      padding: 30px;
+      min-height: 280px;
+      border-radius: 34px;
+      background: rgba(255,250,242,.82);
+      border: 1px solid rgba(255,255,255,.68);
+      box-shadow: 0 20px 56px rgba(64, 42, 23, .12);
+      overflow: hidden;
+    }
+    .person-card::before {
+      content: attr(data-initial);
+      position: absolute;
+      right: -12px;
+      bottom: -28px;
+      font-size: 150px;
+      line-height: .8;
+      font-weight: 950;
+      letter-spacing: -.09em;
+      color: rgba(184,97,66,.10);
+    }
+    .person-card h3 { margin: 0 0 8px; font-size: 34px; line-height: 1; letter-spacing: -.045em; }
+    .role { color: var(--brick); font-weight: 900; margin-bottom: 18px; }
+    .person-card p { color: #5e544b; line-height: 1.55; max-width: 460px; }
+    .contact-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .contact-links a {
+      position: relative;
+      z-index: 1;
+      text-decoration: none;
+      font-weight: 900;
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: rgba(20,17,15,.88);
+      color: white;
+      font-size: 13px;
+    }
+    .contact-links a.secondary { background: rgba(139,90,53,.12); color: var(--wood); }
+
     .final {
       padding: 86px 22px 44px;
       text-align: center;
@@ -416,6 +533,7 @@
       .hero-grid, .renovation, .investment { grid-template-columns: 1fr; }
       .house-stage { position: relative; top: 0; min-height: 500px; }
       .cards { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: 1fr; }
       .process { grid-template-columns: 1fr; }
       .nav-links a:not(.cta) { display: none; }
     }
@@ -433,6 +551,8 @@
   </style>
 </head>
 <body data-stage="0">
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+  <div class="scroll-hud" aria-hidden="true"><b>Remodelación</b><span>0%</span></div>
   <div class="page">
     <nav class="nav" aria-label="Navegación principal">
       <div class="brand">
@@ -443,6 +563,7 @@
         <a href="#vision">Visión</a>
         <a href="#fases">Fases</a>
         <a href="#inversion">Inversión</a>
+        <a href="#equipo">Equipo</a>
         <a class="cta" href="#siguiente">Siguiente paso</a>
       </div>
     </nav>
@@ -461,6 +582,9 @@
 
         <aside class="house-stage" aria-label="Casa que se remodela durante la lectura">
           <div class="sun"></div>
+          <div class="tool-chip t1">🔨 Automatización</div>
+          <div class="tool-chip t2">📐 CRM</div>
+          <div class="tool-chip t3">🏠 MLS</div>
           <div class="blueprint"></div>
           <div class="lot"></div>
           <div class="house" aria-hidden="true">
@@ -513,6 +637,9 @@
         <div class="renovation">
           <aside class="house-stage" aria-label="Visual de remodelación fija">
             <div class="sun"></div>
+            <div class="tool-chip t1">🔨 Llamadas</div>
+            <div class="tool-chip t2">📐 Seguimiento</div>
+            <div class="tool-chip t3">🏠 Ofertas</div>
             <div class="blueprint"></div>
             <div class="lot"></div>
             <div class="house" aria-hidden="true">
@@ -621,6 +748,36 @@
           <div class="time-item"><b>Semanas 6+</b><p>Análisis de ofertas, validación de fuentes externas e integración MLS si el acceso técnico/legal está disponible.</p></div>
         </div>
       </section>
+
+      <section id="equipo" class="section reveal">
+        <div class="section-title">
+          <div class="kicker">Equipo SolversAI</div>
+          <h2>Si F2F decide avanzar, estos son los puntos de contacto.</h2>
+          <p class="sub">La implementación combina dirección estratégica, arquitectura de solución y acompañamiento comercial/operativo para que la automatización aterrice en la realidad del negocio.</p>
+        </div>
+        <div class="team-grid">
+          <article class="person-card" data-initial="V">
+            <div class="kicker">Dirección estratégica</div>
+            <h3>Valentin Florez</h3>
+            <div class="role">Arquitectura de solución, visión técnica y aprobación estratégica.</div>
+            <p>Responsable de convertir el objetivo de negocio en una solución concreta, validar el alcance técnico y asegurar que la implementación tenga impacto real para F2F.</p>
+            <div class="contact-links">
+              <a href="mailto:solvers.solvers@gmail.com?subject=F2F%20-%20Propuesta%20Automatizaci%C3%B3n">solvers.solvers@gmail.com</a>
+              <a class="secondary" href="tel:+573216424600">+57 321 642 4600</a>
+            </div>
+          </article>
+          <article class="person-card" data-initial="V">
+            <div class="kicker">Coordinación comercial y operativa</div>
+            <h3>Valentina Valdés</h3>
+            <div class="role">Acompañamiento, seguimiento, agenda y aterrizaje operativo.</div>
+            <p>Punto de contacto para coordinar siguientes pasos, resolver dudas de la propuesta y acompañar la transición desde la aprobación hasta la puesta en marcha.</p>
+            <div class="contact-links">
+              <a href="mailto:valentina@solversai.com?subject=F2F%20-%20Propuesta%20Automatizaci%C3%B3n">valentina@solversai.com</a>
+              <a class="secondary" href="mailto:solvers.solvers@gmail.com?cc=valentina@solversai.com&subject=F2F%20-%20Aprobaci%C3%B3n%20propuesta">Enviar aprobación</a>
+            </div>
+          </article>
+        </div>
+      </section>
     </main>
 
     <section id="siguiente" class="final reveal">
@@ -638,6 +795,8 @@
 
   <script>
     const body = document.body;
+    const root = document.documentElement;
+    const progressText = document.querySelector('.scroll-hud span');
     const phases = [...document.querySelectorAll('[data-phase]')];
     const reveals = [...document.querySelectorAll('.reveal')];
 
@@ -659,10 +818,16 @@
     const updateStageFromScroll = () => {
       const max = document.documentElement.scrollHeight - innerHeight;
       const p = max > 0 ? scrollY / max : 0;
+      root.style.setProperty('--scroll', p.toFixed(4));
+      if (progressText) progressText.textContent = `${Math.round(p * 100)}%`;
       if (p < .22) body.dataset.stage = '0';
       else if (p < .42 && body.dataset.stage === '0') body.dataset.stage = '1';
     };
     addEventListener('scroll', updateStageFromScroll, { passive: true });
+    addEventListener('pointermove', event => {
+      root.style.setProperty('--mx', `${event.clientX - innerWidth / 2}px`);
+      root.style.setProperty('--my', `${event.clientY - innerHeight / 2}px`);
+    }, { passive: true });
     updateStageFromScroll();
   </script>
 </body>
