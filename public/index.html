@@ -462,6 +462,31 @@
     .amount span { color: rgba(255,255,255,.68); font-weight: 800; padding-bottom: 8px; }
     .monthly { margin-top: 20px; padding: 20px; border-radius: 24px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.14); }
     .monthly b { color: #f2c67d; font-size: 28px; }
+    .discount-note {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(255,255,255,.82);
+      background: rgba(242,198,125,.12);
+      border: 1px solid rgba(242,198,125,.26);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .discount-note del { color: rgba(255,255,255,.44); }
+    .term-note {
+      margin-top: 14px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      color: rgba(255,255,255,.82);
+      background: rgba(20,17,15,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .term-note strong { color: #f2c67d; }
 
     .deliverables { padding: 28px; border-radius: 38px; background: rgba(255,250,242,.82); border: 1px solid rgba(255,255,255,.62); box-shadow: 0 20px 56px rgba(64, 42, 23, .12); }
     .deliverables ul { margin: 18px 0 0; padding-left: 20px; }
@@ -720,12 +745,14 @@
           <article class="price-card">
             <div class="kicker" style="color:#f2c67d">Inversión propuesta</div>
             <h3>Implementación completa de la integración hablada en reunión.</h3>
+            <div class="discount-note"><span>Valor inicial <del>US$9.500</del></span><span>·</span><span>Valor preferencial por referido de Nicolás</span></div>
             <div class="amount"><b>US$5.000</b><span>implementación</span></div>
             <p style="color:rgba(255,255,255,.76); line-height:1.6; max-width:620px">Incluye diseño, configuración e integración inicial del sistema por fases: llamadas, clasificación, CRM, seguimiento, análisis de ofertas y preparación para integración de datos.</p>
             <div class="monthly">
               <span>Gestión, soporte y mejora continua</span><br />
               <b>US$1.000 / mes</b>
             </div>
+            <div class="term-note"><strong>Condición de acompañamiento:</strong> una vez finalizado el desarrollo e iniciada la etapa de gestión mensual, trabajamos con una permanencia mínima de <strong>3 meses</strong>. Esto nos permite acompañar la adopción, monitorear resultados reales y optimizar el sistema con estabilidad durante sus primeros ciclos de operación.</div>
           </article>
           <aside class="deliverables">
             <div class="kicker">Incluye</div>
