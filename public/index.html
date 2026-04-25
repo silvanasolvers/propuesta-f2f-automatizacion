@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F2F × SolversAI | Propuesta de Automatización Inmobiliaria</title>
+  <meta name="description" content="Propuesta interactiva para F2F: automatización de llamadas, CRM, análisis de ofertas e integración MLS." />
+  <meta property="og:title" content="F2F × SolversAI | Propuesta de Automatización" />
+  <meta property="og:description" content="Una casa operativa que se remodela en tres fases: contacto, gestión y prospección automática." />
+  <style>
+    :root {
+      --ink: #14110f;
+      --muted: #766d63;
+      --paper: #f6efe6;
+      --paper-2: #efe2d2;
+      --wood: #8b5a35;
+      --brick: #b86142;
+      --terracotta: #d88a61;
+      --sage: #879b80;
+      --cream: #fffaf2;
+      --steel: #35424d;
+      --gold: #d2a75f;
+      --line: rgba(20,17,15,.14);
+      --shadow: 0 24px 80px rgba(53, 40, 28, .18);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(216,138,97,.22), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(135,155,128,.2), transparent 32%),
+        linear-gradient(180deg, var(--paper), #fff9ef 45%, #eee0cf 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .34;
+      mix-blend-mode: multiply;
+      background-image:
+        linear-gradient(rgba(20,17,15,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20,17,15,.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      z-index: 0;
+    }
+
+    a { color: inherit; }
+    .page { position: relative; z-index: 1; }
+
+    .nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(1120px, calc(100vw - 28px));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px 12px 18px;
+      border: 1px solid rgba(255,255,255,.42);
+      background: rgba(255,250,242,.72);
+      backdrop-filter: blur(18px);
+      border-radius: 999px;
+      box-shadow: 0 12px 36px rgba(64, 42, 23, .12);
+      z-index: 20;
+    }
+    .brand { display: flex; gap: 10px; align-items: center; font-weight: 800; letter-spacing: -.02em; }
+    .brand img { width: 28px; height: 28px; object-fit: contain; border-radius: 8px; }
+    .nav-links { display: flex; gap: 6px; align-items: center; }
+    .nav a { text-decoration: none; font-size: 13px; color: var(--muted); padding: 9px 12px; border-radius: 99px; }
+    .nav a:hover { color: var(--ink); background: rgba(139,90,53,.09); }
+    .nav .cta { color: #fff; background: var(--ink); }
+    .nav .cta:hover { background: var(--steel); color: #fff; }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 128px 22px 70px;
+    }
+    .hero-grid {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 42px;
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--wood);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .eyebrow::before { content: ""; width: 34px; height: 2px; background: var(--wood); }
+    h1 {
+      margin: 0;
+      font-size: clamp(46px, 8vw, 104px);
+      line-height: .88;
+      letter-spacing: -.075em;
+      max-width: 720px;
+    }
+    .accent { color: var(--brick); }
+    .lead {
+      margin: 26px 0 0;
+      max-width: 650px;
+      font-size: clamp(18px, 2.4vw, 24px);
+      line-height: 1.35;
+      color: #4f453c;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 34px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-weight: 800;
+      background: var(--cream);
+      box-shadow: 0 10px 26px rgba(64, 42, 23, .12);
+    }
+    .button.primary { background: var(--ink); color: white; border-color: var(--ink); }
+
+    .house-stage {
+      position: sticky;
+      top: 96px;
+      min-height: 560px;
+      display: grid;
+      place-items: center;
+      border-radius: 42px;
+      background:
+        linear-gradient(140deg, rgba(255,255,255,.42), rgba(255,255,255,.12)),
+        linear-gradient(180deg, rgba(139,90,53,.10), rgba(135,155,128,.12));
+      border: 1px solid rgba(255,255,255,.48);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .house-stage::before {
+      content: "ANTES → DESPUÉS";
+      position: absolute;
+      top: 22px;
+      left: 24px;
+      font-size: 12px;
+      letter-spacing: .22em;
+      font-weight: 900;
+      color: rgba(20,17,15,.46);
+    }
+    .sun {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      top: 56px;
+      right: 48px;
+      background: radial-gradient(circle, #f4cb76 0 38%, rgba(244,203,118,.25) 40% 65%, transparent 67%);
+      filter: blur(.2px);
+      opacity: .8;
+    }
+    .lot {
+      position: absolute;
+      bottom: 86px;
+      width: 78%;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(70, 78, 52, .18);
+      filter: blur(7px);
+    }
+    .house {
+      position: relative;
+      width: min(430px, 86vw);
+      height: 380px;
+      transform-style: preserve-3d;
+    }
+    .roof {
+      position: absolute;
+      left: 40px;
+      top: 42px;
+      width: 350px;
+      height: 178px;
+      background: linear-gradient(135deg, #74452d, #b55f3e);
+      clip-path: polygon(50% 0, 100% 72%, 90% 72%, 90% 100%, 10% 100%, 10% 72%, 0 72%);
+      transform: translateY(var(--roof-y, 36px)) rotate(var(--roof-r, -2deg));
+      opacity: var(--roof-o, .36);
+      transition: .6s ease;
+      box-shadow: 0 22px 50px rgba(97, 58, 35, .24);
+    }
+    .walls {
+      position: absolute;
+      left: 82px;
+      top: 164px;
+      width: 266px;
+      height: 166px;
+      border-radius: 8px 8px 18px 18px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.35), transparent 32%),
+        repeating-linear-gradient(0deg, transparent 0 30px, rgba(120,70,40,.12) 31px 32px),
+        #d9b08d;
+      transform: translateY(var(--wall-y, 54px));
+      opacity: var(--wall-o, .42);
+      transition: .6s ease;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.4), 0 22px 40px rgba(83,62,43,.16);
+    }
+    .door {
+      position: absolute;
+      left: 182px;
+      top: 225px;
+      width: 66px;
+      height: 104px;
+      border-radius: 38px 38px 8px 8px;
+      background: linear-gradient(180deg, #5e3a25, #2d2119);
+      transform: translateY(var(--door-y, 80px));
+      opacity: var(--door-o, .22);
+      transition: .6s ease;
+    }
+    .door::after { content: ""; position: absolute; right: 14px; top: 58px; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); }
+    .window {
+      position: absolute;
+      top: 212px;
+      width: 58px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f4fbff, #8fc1d8);
+      box-shadow: inset 0 0 0 7px rgba(255,250,242,.8);
+      opacity: var(--window-o, .15);
+      transform: scale(var(--window-s, .65));
+      transition: .6s ease;
+    }
+    .w1 { left: 108px; }
+    .w2 { right: 108px; }
+    .blueprint {
+      position: absolute;
+      inset: 42px;
+      border: 2px dashed rgba(53,66,77,.34);
+      border-radius: 28px;
+      opacity: var(--blueprint-o, .9);
+      transform: scale(var(--blueprint-s, 1));
+      transition: .6s ease;
+    }
+    .blueprint::before, .blueprint::after {
+      content: "";
+      position: absolute;
+      background: rgba(53,66,77,.24);
+      border-radius: 3px;
+    }
+    .blueprint::before { width: 64%; height: 2px; left: 18%; top: 45%; transform: rotate(-28deg); }
+    .blueprint::after { width: 2px; height: 58%; left: 50%; top: 20%; }
+    .signal {
+      position: absolute;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(255,250,242,.9);
+      border: 1px solid rgba(20,17,15,.1);
+      color: var(--steel);
+      box-shadow: 0 10px 28px rgba(64, 42, 23, .14);
+      opacity: var(--signal-o, 0);
+      transform: translateY(var(--signal-y, 16px));
+      transition: .6s ease;
+    }
+    .s1 { left: 32px; bottom: 128px; }
+    .s2 { right: 30px; bottom: 178px; }
+    .s3 { left: 126px; top: 118px; }
+
+    body[data-stage="1"] { --blueprint-o: .72; --roof-y: 18px; --roof-o: .52; --wall-y: 28px; --wall-o: .58; --door-y: 54px; --door-o: .38; --window-o: .28; --window-s: .76; --signal-o: .35; --signal-y: 10px; }
+    body[data-stage="2"] { --blueprint-o: .34; --blueprint-s: .96; --roof-y: 4px; --roof-r: 0deg; --roof-o: .82; --wall-y: 8px; --wall-o: .86; --door-y: 20px; --door-o: .72; --window-o: .78; --window-s: .94; --signal-o: .72; --signal-y: 3px; }
+    body[data-stage="3"] { --blueprint-o: .12; --blueprint-s: .92; --roof-y: 0px; --roof-r: 0deg; --roof-o: 1; --wall-y: 0px; --wall-o: 1; --door-y: 0px; --door-o: 1; --window-o: 1; --window-s: 1; --signal-o: 1; --signal-y: 0px; }
+
+    .section {
+      width: min(1120px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 96px 0;
+    }
+    .section-title { max-width: 820px; margin-bottom: 36px; }
+    .kicker { color: var(--brick); text-transform: uppercase; letter-spacing: .13em; font-size: 13px; font-weight: 900; margin-bottom: 12px; }
+    h2 { margin: 0; font-size: clamp(34px, 5vw, 64px); line-height: .96; letter-spacing: -.055em; }
+    .sub { color: #5e544b; font-size: 19px; line-height: 1.55; margin: 18px 0 0; max-width: 760px; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      position: relative;
+      min-height: 260px;
+      padding: 28px;
+      border-radius: var(--radius);
+      background: rgba(255,250,242,.78);
+      border: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 18px 48px rgba(64, 42, 23, .11);
+      overflow: hidden;
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      right: -70px;
+      bottom: -70px;
+      border-radius: 50%;
+      background: rgba(216,138,97,.15);
+    }
+    .card .num { font-size: 13px; font-weight: 900; color: var(--wood); letter-spacing: .12em; }
+    .card h3 { margin: 34px 0 14px; font-size: 28px; line-height: 1; letter-spacing: -.035em; }
+    .card p, .card li { color: #665c52; line-height: 1.55; }
+    .card ul { padding-left: 20px; margin: 0; }
+
+    .renovation {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .phase-list { display: grid; gap: 16px; }
+    .phase {
+      min-height: 360px;
+      padding: 32px;
+      border-radius: 32px;
+      background: rgba(255,250,242,.84);
+      border: 1px solid rgba(255,255,255,.62);
+      box-shadow: 0 20px 56px rgba(64, 42, 23, .12);
+    }
+    .phase h3 { margin: 0 0 14px; font-size: clamp(28px, 4vw, 42px); line-height: 1; letter-spacing: -.04em; }
+    .phase p { color: #5e544b; font-size: 17px; line-height: 1.6; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .pill { padding: 9px 12px; border-radius: 999px; background: rgba(135,155,128,.16); color: #42513d; border: 1px solid rgba(66,81,61,.12); font-weight: 800; font-size: 13px; }
+
+    .process {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      padding: 20px;
+      border-radius: 32px;
+      background: rgba(20,17,15,.88);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    .step { padding: 18px; border-radius: 22px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+    .step strong { display: block; color: #f2c67d; margin-bottom: 10px; }
+    .step span { color: rgba(255,255,255,.76); font-size: 14px; line-height: 1.45; }
+
+    .investment {
+      display: grid;
+      grid-template-columns: 1fr .9fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+    .price-card {
+      padding: clamp(30px, 5vw, 54px);
+      border-radius: 38px;
+      background: linear-gradient(135deg, #1b1713, #3a2b21 62%, #7b4b32);
+      color: white;
+      box-shadow: 0 30px 90px rgba(33, 24, 17, .28);
+      position: relative;
+      overflow: hidden;
+    }
+    .price-card::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      right: -160px;
+      top: -160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(210,167,95,.34), transparent 65%);
+    }
+    .price-card h3 { margin: 0 0 18px; font-size: clamp(32px, 5vw, 58px); line-height: .96; letter-spacing: -.055em; max-width: 680px; }
+    .amount { display: flex; align-items: end; gap: 14px; margin: 34px 0 8px; }
+    .amount b { font-size: clamp(54px, 8vw, 92px); line-height: .8; letter-spacing: -.07em; }
+    .amount span { color: rgba(255,255,255,.68); font-weight: 800; padding-bottom: 8px; }
+    .monthly { margin-top: 20px; padding: 20px; border-radius: 24px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.14); }
+    .monthly b { color: #f2c67d; font-size: 28px; }
+
+    .deliverables { padding: 34px; border-radius: 38px; background: rgba(255,250,242,.82); border: 1px solid rgba(255,255,255,.62); box-shadow: 0 20px 56px rgba(64, 42, 23, .12); }
+    .deliverables ul { margin: 18px 0 0; padding-left: 20px; }
+    .deliverables li { margin: 12px 0; line-height: 1.45; color: #5e544b; }
+
+    .timeline { display: grid; gap: 14px; }
+    .time-item { display: grid; grid-template-columns: 120px 1fr; gap: 18px; padding: 22px; border-radius: 26px; background: rgba(255,250,242,.75); border: 1px solid rgba(255,255,255,.6); }
+    .time-item b { color: var(--brick); }
+    .time-item p { margin: 0; color: #5e544b; line-height: 1.5; }
+
+    .final {
+      padding: 86px 22px 44px;
+      text-align: center;
+      background: linear-gradient(180deg, transparent, rgba(20,17,15,.08));
+    }
+    .final-box {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: clamp(34px, 6vw, 70px);
+      border-radius: 44px;
+      background: rgba(255,250,242,.86);
+      border: 1px solid rgba(255,255,255,.7);
+      box-shadow: var(--shadow);
+    }
+    .final h2 { max-width: 820px; margin: 0 auto; }
+    .footer { margin-top: 42px; color: var(--muted); font-size: 14px; }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .75s ease, transform .75s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 980px) {
+      .hero-grid, .renovation, .investment { grid-template-columns: 1fr; }
+      .house-stage { position: relative; top: 0; min-height: 500px; }
+      .cards { grid-template-columns: 1fr; }
+      .process { grid-template-columns: 1fr; }
+      .nav-links a:not(.cta) { display: none; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 110px; }
+      .nav { top: 10px; }
+      .brand span { display: none; }
+      .section { padding: 70px 0; }
+      .time-item { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; }
+      .button { width: 100%; }
+      .phase { min-height: auto; }
+      .house { transform: scale(.82); }
+    }
+  </style>
+</head>
+<body data-stage="0">
+  <div class="page">
+    <nav class="nav" aria-label="Navegación principal">
+      <div class="brand">
+        <img src="/solvers-logo-small.png" alt="SolversAI" onerror="this.style.display='none'" />
+        <span>SolversAI × F2F</span>
+      </div>
+      <div class="nav-links">
+        <a href="#vision">Visión</a>
+        <a href="#fases">Fases</a>
+        <a href="#inversion">Inversión</a>
+        <a class="cta" href="#siguiente">Siguiente paso</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Propuesta interactiva</div>
+          <h1>Remodelar la operación comercial de <span class="accent">F2F</span>.</h1>
+          <p class="lead">Una integración de IA para que la prospección inmobiliaria deje de ser una lista de llamadas y se convierta en una casa operativa: con cimientos, habitaciones, seguimiento y flujo constante de oportunidades.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#fases">Ver remodelación</a>
+            <a class="button" href="#inversion">Ver inversión</a>
+          </div>
+        </div>
+
+        <aside class="house-stage" aria-label="Casa que se remodela durante la lectura">
+          <div class="sun"></div>
+          <div class="blueprint"></div>
+          <div class="lot"></div>
+          <div class="house" aria-hidden="true">
+            <div class="roof"></div>
+            <div class="walls"></div>
+            <div class="door"></div>
+            <div class="window w1"></div>
+            <div class="window w2"></div>
+            <div class="signal s1">Lead interesado</div>
+            <div class="signal s2">Oferta estimada</div>
+            <div class="signal s3">Seguimiento activo</div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main>
+      <section id="vision" class="section reveal">
+        <div class="section-title">
+          <div class="kicker">El punto de partida</div>
+          <h2>F2F ya tiene el terreno. La propuesta es construir el sistema encima.</h2>
+          <p class="sub">La reunión mostró una necesidad clara: ordenar leads, automatizar contacto, registrar respuestas, programar seguimientos y analizar propiedades antes de decidir si vale la pena hacer una oferta.</p>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <div class="num">01 / CONTACTO</div>
+            <h3>Llamadas que no se quedan en el aire.</h3>
+            <p>El sistema contacta prospectos, registra la conversación y clasifica el resultado: interesado, no interesado, devolver llamada, número equivocado o revisión manual.</p>
+          </article>
+          <article class="card">
+            <div class="num">02 / GESTIÓN</div>
+            <h3>Un CRM como plano de obra.</h3>
+            <p>Cada lead queda ubicado en una etapa: nuevo, contactado, interesado, pendiente, negociando, cerrado o descartado. Nada queda suelto.</p>
+          </article>
+          <article class="card">
+            <div class="num">03 / OFERTA</div>
+            <h3>Análisis antes de remodelar.</h3>
+            <p>Con una dirección, el asistente estima potencial de negocio: ARV, remodelación, margen y rango recomendado para ofertar.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="fases" class="section">
+        <div class="section-title reveal">
+          <div class="kicker">La remodelación por fases</div>
+          <h2>A medida que F2F avanza, la casa operativa toma forma.</h2>
+          <p class="sub">La implementación se divide para validar rápido, reducir riesgo y construir una operación cada vez más autónoma.</p>
+        </div>
+
+        <div class="renovation">
+          <aside class="house-stage" aria-label="Visual de remodelación fija">
+            <div class="sun"></div>
+            <div class="blueprint"></div>
+            <div class="lot"></div>
+            <div class="house" aria-hidden="true">
+              <div class="roof"></div>
+              <div class="walls"></div>
+              <div class="door"></div>
+              <div class="window w1"></div>
+              <div class="window w2"></div>
+              <div class="signal s1">CRM</div>
+              <div class="signal s2">MLS</div>
+              <div class="signal s3">IA</div>
+            </div>
+          </aside>
+
+          <div class="phase-list">
+            <article class="phase reveal" data-phase="1">
+              <div class="kicker">Fase 1 · Cimientos</div>
+              <h3>Infraestructura y automatización de llamadas.</h3>
+              <p>Configuramos el agente de llamadas, el guion comercial, la voz, el ritmo y la salida estructurada. El objetivo es convertir cada contacto en información útil para la operación.</p>
+              <div class="pill-row">
+                <span class="pill">Agente de llamadas</span>
+                <span class="pill">Guion en frío</span>
+                <span class="pill">Clasificación de respuestas</span>
+                <span class="pill">Base organizada</span>
+              </div>
+            </article>
+
+            <article class="phase reveal" data-phase="2">
+              <div class="kicker">Fase 2 · Distribución interna</div>
+              <h3>Gestión de leads y análisis de operaciones.</h3>
+              <p>El sistema se convierte en un CRM operativo: estados, notas, agenda de seguimiento y resumen diario. Además, se integra un asistente para estimar oportunidades antes de ofertar.</p>
+              <div class="pill-row">
+                <span class="pill">CRM de leads</span>
+                <span class="pill">Seguimientos automáticos</span>
+                <span class="pill">ARV estimado</span>
+                <span class="pill">Resumen diario</span>
+              </div>
+            </article>
+
+            <article class="phase reveal" data-phase="3">
+              <div class="kicker">Fase 3 · Fachada inteligente</div>
+              <h3>Integración de datos y prospección automática.</h3>
+              <p>Conectamos fuentes como MLS/Miami Realtors, sujeto a permisos y disponibilidad técnica, para extraer propiedades, enriquecerlas, detectar señales de urgencia y alimentar el motor de llamadas.</p>
+              <div class="pill-row">
+                <span class="pill">API MLS</span>
+                <span class="pill">Enriquecimiento</span>
+                <span class="pill">Señales de urgencia</span>
+                <span class="pill">Cola automática</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="section-title">
+          <div class="kicker">Flujo operativo</div>
+          <h2>De propiedad detectada a oportunidad accionable.</h2>
+        </div>
+        <div class="process">
+          <div class="step"><strong>1. Entrada</strong><span>Leads actuales o propiedades desde MLS entran al sistema.</span></div>
+          <div class="step"><strong>2. Contacto</strong><span>El agente ejecuta llamadas y registra cada resultado.</span></div>
+          <div class="step"><strong>3. CRM</strong><span>El lead queda clasificado con estado, nota y próxima acción.</span></div>
+          <div class="step"><strong>4. Análisis</strong><span>La dirección se evalúa con ARV, remodelación y margen.</span></div>
+          <div class="step"><strong>5. Decisión</strong><span>F2F prioriza a quién llamar, negociar o descartar.</span></div>
+        </div>
+      </section>
+
+      <section id="inversion" class="section">
+        <div class="investment reveal">
+          <article class="price-card">
+            <div class="kicker" style="color:#f2c67d">Inversión propuesta</div>
+            <h3>Implementación completa de la integración hablada en reunión.</h3>
+            <div class="amount"><b>US$5.000</b><span>implementación</span></div>
+            <p style="color:rgba(255,255,255,.76); line-height:1.6; max-width:620px">Incluye diseño, configuración e integración inicial del sistema por fases: llamadas, clasificación, CRM, seguimiento, análisis de ofertas y preparación para integración de datos.</p>
+            <div class="monthly">
+              <span>Gestión, soporte y mejora continua</span><br />
+              <b>US$1.000 / mes</b>
+            </div>
+          </article>
+          <aside class="deliverables">
+            <div class="kicker">Incluye</div>
+            <h3 style="font-size:32px;line-height:1;margin:0;letter-spacing:-.04em">Entregables principales</h3>
+            <ul>
+              <li>Agente conversacional para prospección inmobiliaria.</li>
+              <li>Guion de llamadas y clasificación automática de respuestas.</li>
+              <li>CRM operativo con estados y tareas de seguimiento.</li>
+              <li>Resumen diario de nuevos interesados, pendientes y progreso.</li>
+              <li>Asistente inicial de análisis de propiedades y ofertas.</li>
+              <li>Evaluación e integración de MLS/Miami Realtors según acceso disponible.</li>
+              <li>Gestión mensual para ajustes, monitoreo y optimización.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="section-title">
+          <div class="kicker">Roadmap sugerido</div>
+          <h2>Construcción ordenada, sin romper la operación.</h2>
+        </div>
+        <div class="timeline">
+          <div class="time-item"><b>Semana 1</b><p>Definición de guion, estructura del CRM, fuentes de leads, criterios de clasificación y diseño del flujo operativo.</p></div>
+          <div class="time-item"><b>Semanas 2–3</b><p>Configuración del agente, pruebas controladas de llamadas, ajustes de voz/ritmo y salida estructurada.</p></div>
+          <div class="time-item"><b>Semanas 4–5</b><p>CRM, seguimientos automáticos, panel operativo y resumen diario del embudo comercial.</p></div>
+          <div class="time-item"><b>Semanas 6+</b><p>Análisis de ofertas, validación de fuentes externas e integración MLS si el acceso técnico/legal está disponible.</p></div>
+        </div>
+      </section>
+    </main>
+
+    <section id="siguiente" class="final reveal">
+      <div class="final-box">
+        <div class="kicker">Siguiente paso</div>
+        <h2>Validar el alcance y empezar con un piloto controlado.</h2>
+        <p class="sub" style="margin-left:auto;margin-right:auto">La forma más segura de avanzar es iniciar con un lote definido de leads, medir la calidad de las llamadas y convertir los aprendizajes en el CRM operativo antes de escalar la integración completa.</p>
+        <div class="hero-actions" style="justify-content:center">
+          <a class="button primary" href="mailto:solvers.solvers@gmail.com?subject=F2F%20-%20Aprobaci%C3%B3n%20propuesta%20automatizaci%C3%B3n">Aprobar siguiente paso</a>
+        </div>
+        <div class="footer">Preparado por SolversAI · Propuesta para F2F · Abril 2026</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const body = document.body;
+    const phases = [...document.querySelectorAll('[data-phase]')];
+    const reveals = [...document.querySelectorAll('.reveal')];
+
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.18 });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    const phaseObserver = new IntersectionObserver(entries => {
+      const visible = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) body.dataset.stage = visible.target.dataset.phase;
+    }, { threshold: [0.35, 0.55, 0.75] });
+    phases.forEach(el => phaseObserver.observe(el));
+
+    const updateStageFromScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const p = max > 0 ? scrollY / max : 0;
+      if (p < .22) body.dataset.stage = '0';
+      else if (p < .42 && body.dataset.stage === '0') body.dataset.stage = '1';
+    };
+    addEventListener('scroll', updateStageFromScroll, { passive: true });
+    updateStageFromScroll();
+  </script>
+</body>
+</html>
